@@ -34,12 +34,18 @@ public class AvroSchema implements ParsedSchema {
       new SchemaValidatorBuilder().canReadStrategy().validateLatest();
 
   public final Schema schemaObj;
-  private final String canonicalString;
+  public final String canonicalString;
+  private final Integer version;
 
   public AvroSchema(Schema schemaObj) {
+    this(schemaObj, null);
+  }
+
+  public AvroSchema(Schema schemaObj, Integer version) {
     this.schemaObj = schemaObj;
     //TODO: schema.toString() is not canonical (issue-28)
     this.canonicalString = schemaObj.toString();
+    this.version = version;
   }
 
   public AvroSchema(String schemaString) {
@@ -58,8 +64,7 @@ public class AvroSchema implements ParsedSchema {
 
   @Override
   public Integer version() {
-    // The version is set directly on the Schema instead.
-    return null;
+    return version;
   }
 
   @Override
@@ -85,12 +90,13 @@ public class AvroSchema implements ParsedSchema {
       return false;
     }
     AvroSchema that = (AvroSchema) o;
-    return Objects.equals(schemaObj, that.schemaObj);
+    return Objects.equals(schemaObj, that.schemaObj)
+        && Objects.equals(version, that.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(schemaObj);
+    return Objects.hash(schemaObj, version);
   }
 
   @Override

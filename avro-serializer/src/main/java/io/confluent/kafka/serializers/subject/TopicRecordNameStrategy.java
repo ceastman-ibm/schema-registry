@@ -16,7 +16,7 @@
 
 package io.confluent.kafka.serializers.subject;
 
-import org.apache.avro.Schema;
+import io.confluent.kafka.schemaregistry.ParsedSchema;
 
 /**
  * For any Avro record type that is published to Kafka topic &lt;topic&gt;,
@@ -31,8 +31,8 @@ import org.apache.avro.Schema;
 public class TopicRecordNameStrategy extends RecordNameStrategy {
 
   @Override
-  public String subjectName(String topic, boolean isKey, Schema schema) {
-    if (schema == null || schema.getType() == Schema.Type.NULL) {
+  public String subjectName(String topic, boolean isKey, ParsedSchema schema) {
+    if (schema == null) {
       return null;
     }
     return topic + "-" + getRecordName(schema, isKey);

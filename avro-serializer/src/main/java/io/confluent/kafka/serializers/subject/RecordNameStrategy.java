@@ -17,9 +17,13 @@
 package io.confluent.kafka.serializers.subject;
 
 import java.util.Map;
+
 import org.apache.avro.Schema;
 import org.apache.kafka.common.errors.SerializationException;
-import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
+
+import io.confluent.kafka.schemaregistry.ParsedSchema;
+import io.confluent.kafka.schemaregistry.avro.AvroSchema;
+import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.subject.strategy.SubjectNameStrategy;
 import io.confluent.kafka.serializers.AvroSchemaUtils;
 
@@ -31,7 +35,7 @@ import io.confluent.kafka.serializers.AvroSchemaUtils;
  * Instead, checks compatibility of any occurrences of the same record name
  * across <em>all</em> topics.
  */
-public class RecordNameStrategy implements SubjectNameStrategy<Schema>,
+public class RecordNameStrategy implements SubjectNameStrategy<ParsedSchema>,
     io.confluent.kafka.serializers.subject.SubjectNameStrategy {
 
   @Override
@@ -39,8 +43,8 @@ public class RecordNameStrategy implements SubjectNameStrategy<Schema>,
   }
 
   @Override
-  public String subjectName(String topic, boolean isKey, Schema schema) {
-    if (schema == null || schema.getType() == Schema.Type.NULL) {
+  public String subjectName(String topic, boolean isKey, ParsedSchema schema) {
+    if (schema == null) {
       return null;
     }
     return getRecordName(schema, isKey);
@@ -50,19 +54,24 @@ public class RecordNameStrategy implements SubjectNameStrategy<Schema>,
    * If the schema is an Avro record type, returns its fully-qualified name.
    * Otherwise throws an error.
    */
-  protected String getRecordName(Schema schema, boolean isKey) {
-    if (schema != null && schema.getType() == Schema.Type.RECORD) {
-      return schema.getFullName();
+  protected String getRecordName(ParsedSchema schema, boolean isKey) {
+    if (schema != null && schema instanceof AvroSchema) {
+      Schema avroSchema = ((AvroSchema) schema).schemaObj;
+      if (avroSchema == null || avroSchema.getType() == Schema.Type.NULL) {
+        return null;
+      } else if (avroSchema.getType() == Schema.Type.RECORD) {
+        return avroSchema.getFullName();
+      }
     }
 
     // isKey is only used to produce more helpful error messages
     if (isKey) {
       throw new SerializationException("In configuration "
-          + AbstractKafkaAvroSerDeConfig.KEY_SUBJECT_NAME_STRATEGY + " = "
+          + AbstractKafkaSchemaSerDeConfig.KEY_SUBJECT_NAME_STRATEGY + " = "
           + getClass().getName() + ", the message key must only be an Avro record schema");
     } else {
       throw new SerializationException("In configuration "
-          + AbstractKafkaAvroSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY + " = "
+          + AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY + " = "
           + getClass().getName() + ", the message value must only be an Avro record schema");
     }
   }
@@ -70,6 +79,6 @@ public class RecordNameStrategy implements SubjectNameStrategy<Schema>,
   @Override
   @Deprecated
   public String getSubjectName(String topic, boolean isKey, Object value) {
-    return subjectName(topic, isKey, AvroSchemaUtils.getSchema(value));
+    return subjectName(topic, isKey, new AvroSchema(AvroSchemaUtils.getSchema(value)));
   }
 }
