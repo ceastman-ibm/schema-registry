@@ -89,7 +89,7 @@ public class CachedSchemaRegistryClientTest {
   @Test
   public void testRegisterSchemaCache() throws Exception {
     // Expect one call to register schema
-    expect(restService.registerSchema(anyString(), eq(SUBJECT_0)))
+    expect(restService.registerSchema(anyString(), anyString(), eq(SUBJECT_0)))
         .andReturn(ID_25)
         .once();
 
@@ -104,7 +104,7 @@ public class CachedSchemaRegistryClientTest {
   @Test
   public void testRegisterSchemaCacheWithVersionAndId() throws Exception {
     // Expect one call to register schema
-    expect(restService.registerSchema(anyString(), eq(SUBJECT_0), eq(VERSION_1), eq(ID_25)))
+    expect(restService.registerSchema(anyString(), anyString(), eq(SUBJECT_0), eq(VERSION_1), eq(ID_25)))
         .andReturn(ID_25)
         .once();
 
@@ -118,7 +118,7 @@ public class CachedSchemaRegistryClientTest {
 
   @Test
   public void testRegisterOverCapacity() throws Exception {
-    expect(restService.registerSchema(anyString(), anyString()))
+    expect(restService.registerSchema(anyString(), anyString(), anyString()))
         .andReturn(ID_25)
         .andReturn(26)
         .andReturn(27)
@@ -144,7 +144,7 @@ public class CachedSchemaRegistryClientTest {
 
   @Test
   public void testIdCache() throws Exception {
-    expect(restService.registerSchema(anyString(), eq(SUBJECT_0)))
+    expect(restService.registerSchema(anyString(), anyString(), eq(SUBJECT_0)))
         .andReturn(ID_25);
 
     // Expect only one call to getId (the rest should hit the cache)
@@ -166,11 +166,11 @@ public class CachedSchemaRegistryClientTest {
   public void testVersionCache() throws Exception {
     int version = 7;
 
-    expect(restService.registerSchema(anyString(), eq(SUBJECT_0)))
+    expect(restService.registerSchema(anyString(), anyString(), eq(SUBJECT_0)))
         .andReturn(ID_25);
 
     // Expect only one call to lookup the subject (the rest should hit the cache)
-    expect(restService.lookUpSubjectVersion(anyString(), eq(SUBJECT_0), eq(true)))
+    expect(restService.lookUpSubjectVersion(anyString(), anyString(), eq(SUBJECT_0), eq(true)))
         .andReturn(
             new io.confluent.kafka.schemaregistry.client.rest.entities.Schema(SUBJECT_0, version,
                 ID_25, AvroSchema.AVRO, SCHEMA_STR_0));
@@ -192,9 +192,9 @@ public class CachedSchemaRegistryClientTest {
     String subjectOne = "subjectOne";
     String subjectTwo = "subjectTwo";
 
-    expect(restService.registerSchema(anyString(), eq(subjectOne)))
+    expect(restService.registerSchema(anyString(), anyString(), eq(subjectOne)))
         .andReturn(ID_25);
-    expect(restService.registerSchema(anyString(), eq(subjectTwo)))
+    expect(restService.registerSchema(anyString(), anyString(), eq(subjectTwo)))
         .andReturn(ID_25);
 
     expect(restService.getId(eq(ID_25)))
@@ -223,7 +223,7 @@ public class CachedSchemaRegistryClientTest {
 
   @Test
   public void testDeleteSchemaCache() throws Exception {
-    expect(restService.registerSchema(anyString(), eq(SUBJECT_0)))
+    expect(restService.registerSchema(anyString(), anyString(), eq(SUBJECT_0)))
         .andReturn(ID_25)
         .once();
 
@@ -244,11 +244,11 @@ public class CachedSchemaRegistryClientTest {
   public void testDeleteVersionCache() throws Exception {
     int version = 7;
 
-    expect(restService.registerSchema(anyString(), eq(SUBJECT_0)))
+    expect(restService.registerSchema(anyString(), anyString(), eq(SUBJECT_0)))
         .andReturn(ID_25);
 
     // Expect only one call to lookup the subject (the rest should hit the cache)
-    expect(restService.lookUpSubjectVersion(anyString(), eq(SUBJECT_0), eq(true)))
+    expect(restService.lookUpSubjectVersion(anyString(), anyString(), eq(SUBJECT_0), eq(true)))
         .andReturn(new io.confluent.kafka.schemaregistry.client.rest.entities.Schema(SUBJECT_0,
                                                                                      version,
             ID_25,
@@ -324,7 +324,7 @@ public class CachedSchemaRegistryClientTest {
 
   @Test
   public void testThreadSafe() throws Exception {
-    expect(restService.registerSchema(anyString(), eq(SUBJECT_0)))
+    expect(restService.registerSchema(anyString(), anyString(), eq(SUBJECT_0)))
         .andReturn(ID_25)
         .anyTimes();
 
@@ -332,7 +332,7 @@ public class CachedSchemaRegistryClientTest {
         .andReturn(new SchemaString(SCHEMA_STR_0))
         .anyTimes();
 
-    expect(restService.lookUpSubjectVersion(eq(AVRO_SCHEMA_0.toString()), eq(SUBJECT_0), anyBoolean()))
+    expect(restService.lookUpSubjectVersion(eq(AVRO_SCHEMA_0.toString()), anyString(), eq(SUBJECT_0), anyBoolean()))
         .andReturn(SCHEMA_DETAILS)
         .anyTimes();
 

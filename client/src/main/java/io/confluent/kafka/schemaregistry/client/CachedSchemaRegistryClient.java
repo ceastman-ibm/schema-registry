@@ -169,12 +169,13 @@ public class CachedSchemaRegistryClient implements SchemaRegistryClient {
 
   private int registerAndGetId(String subject, ParsedSchema schema)
       throws IOException, RestClientException {
-    return restService.registerSchema(schema.toString(), subject);
+    return restService.registerSchema(schema.canonicalString(), schema.schemaType(), subject);
   }
 
   private int registerAndGetId(String subject, ParsedSchema schema, int version, int id)
       throws IOException, RestClientException {
-    return restService.registerSchema(schema.toString(), subject, version, id);
+    return restService.registerSchema(schema.canonicalString(), schema.schemaType(),
+        subject, version, id);
   }
 
   protected ParsedSchema getSchemaByIdFromRegistry(int id) throws IOException, RestClientException {
@@ -185,14 +186,16 @@ public class CachedSchemaRegistryClient implements SchemaRegistryClient {
   private int getVersionFromRegistry(String subject, ParsedSchema schema)
       throws IOException, RestClientException {
     io.confluent.kafka.schemaregistry.client.rest.entities.Schema response =
-        restService.lookUpSubjectVersion(schema.toString(), subject, true);
+        restService.lookUpSubjectVersion(schema.canonicalString(),
+            schema.schemaType(), subject, true);
     return response.getVersion();
   }
 
   private int getIdFromRegistry(String subject, ParsedSchema schema)
       throws IOException, RestClientException {
     io.confluent.kafka.schemaregistry.client.rest.entities.Schema response =
-        restService.lookUpSubjectVersion(schema.toString(), subject, false);
+        restService.lookUpSubjectVersion(schema.canonicalString(),
+            schema.schemaType(), subject, false);
     return response.getId();
   }
 
@@ -364,7 +367,8 @@ public class CachedSchemaRegistryClient implements SchemaRegistryClient {
   @Override
   public boolean testCompatibility(String subject, ParsedSchema schema)
       throws IOException, RestClientException {
-    return restService.testCompatibility(schema.toString(), subject, "latest");
+    return restService.testCompatibility(schema.canonicalString(), schema.schemaType(),
+        subject, "latest");
   }
 
   @Override

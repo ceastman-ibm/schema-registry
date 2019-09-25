@@ -66,7 +66,7 @@ public class MockSchemaRegistryClient implements SchemaRegistryClient {
     if (idCache.containsKey(subject)) {
       idSchemaMap = idCache.get(subject);
       for (Map.Entry<Integer, ParsedSchema> entry : idSchemaMap.entrySet()) {
-        if (entry.getValue().toString().equals(schema.toString())) {
+        if (entry.getValue().canonicalString().equals(schema.canonicalString())) {
           if (registerRequest) {
             if (id >= 0 && id != entry.getKey()) {
               throw new IllegalStateException("Schema already registered with id "
@@ -222,11 +222,11 @@ public class MockSchemaRegistryClient implements SchemaRegistryClient {
     int id = -1;
     Map<Integer, ParsedSchema> idSchemaMap = idCache.get(subject);
     for (Map.Entry<Integer, ParsedSchema> entry : idSchemaMap.entrySet()) {
-      if (entry.getValue().toString().equals(schema.toString())) {
+      if (entry.getValue().canonicalString().equals(schema.canonicalString())) {
         id = entry.getKey();
       }
     }
-    return new SchemaMetadata(id, version, schema.schemaType(), schema.toString());
+    return new SchemaMetadata(id, version, schema.schemaType(), schema.canonicalString());
   }
 
   @Override
