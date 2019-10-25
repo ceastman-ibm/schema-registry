@@ -111,7 +111,7 @@ public class AbstractKafkaSchemaSerDeConfig extends AbstractConfig {
   public static final String SCHEMA_REFLECTION_CONFIG = "schema.reflection";
   public static final boolean SCHEMA_REFLECTION_DEFAULT = false;
   public static final String SCHEMA_REFLECTION_DOC =
-      "If true, uses the Avro reflection API when serializing/deserializing ";
+      "If true, uses the reflection API when serializing/deserializing ";
 
   public static final String PROXY_HOST = SchemaRegistryClientConfig.PROXY_HOST;
   public static final String PROXY_HOST_DEFAULT = "";

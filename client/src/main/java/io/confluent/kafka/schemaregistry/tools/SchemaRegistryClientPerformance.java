@@ -74,7 +74,7 @@ public class SchemaRegistryClientPerformance extends AbstractPerformanceTest {
   }
 
   // sequential schema maker
-  private static AvroSchema makeSchema(long num) {
+  private static AvroSchema makeAvroSchema(long num) {
     String schemaString = "{\"type\":\"record\","
                           + "\"name\":\"myrecord\","
                           + "\"fields\":"
@@ -87,7 +87,7 @@ public class SchemaRegistryClientPerformance extends AbstractPerformanceTest {
 
   @Override
   protected void doIteration(PerformanceStats.Callback cb) {
-    AvroSchema schema = makeSchema(this.registeredSchemas);
+    AvroSchema schema = makeAvroSchema(this.registeredSchemas);
 
     try {
       client.register(this.subject, schema);

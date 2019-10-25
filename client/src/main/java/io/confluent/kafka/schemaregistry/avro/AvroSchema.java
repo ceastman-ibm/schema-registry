@@ -34,7 +34,7 @@ public class AvroSchema implements ParsedSchema {
       new SchemaValidatorBuilder().canReadStrategy().validateLatest();
 
   public final Schema schemaObj;
-  public final String canonicalString;
+  private final String canonicalString;
   private final Integer version;
 
   public AvroSchema(Schema schemaObj) {
